@@ -31,39 +31,39 @@ regras:
 
 using namespace std;
 
-#define B 1
-#define A -1
+#define B 5
+#define A 1
 
 // ASSINATURAS DAS FUNCOES
 int intervalMenu();
-float ruleMenu(vector<pair<float, float> >);
+long double ruleMenu(vector<pair<long double, long double> >);
 void clearScreen();
 
-vector<pair<float, float> > readTable(int);
+vector<pair<long double, long double> > readTable(string, int);
 
-float calcFunction(float);
+long double calcFunction(long double);
 
-float ponto_medio(vector<pair<float, float> >);
-float trapezios(vector<pair<float, float> >);
-float simpson(vector<pair<float, float> >);
-float gaussiana(vector<pair<float, float> >);
+long double ponto_medio(vector<pair<long double, long double> >);
+long double trapezios(vector<pair<long double, long double> >);
+long double simpson(vector<pair<long double, long double> >);
+long double gaussiana(vector<pair<long double, long double> >);
 
 int main()
 {
   int interval, rule;
-  vector<pair<float, float> > intervalPoints;
-  float result;
+  vector<pair<long double, long double> > intervalPoints;
+  long double result;
 
   interval = intervalMenu();
-  intervalPoints = readTable(interval);
+  intervalPoints = readTable("table.txt", interval);
   result = ruleMenu(intervalPoints);
   cout << "Resultado final: " << result << endl;
   return 0;
 }
 
-float calcFunction(float x_value)
+long double calcFunction(long double x_value)
 {
-  return (x_value*x_value);
+  return 2*(x_value*x_value*x_value)+3*(x_value*x_value)+6*(x_value)+1;
 }
 
 int intervalMenu()
@@ -77,13 +77,13 @@ int intervalMenu()
   return interval;
 }
 
-vector<pair<float, float> > readTable(int interval)
+vector<pair<long double, long double> > readTable(string filename, int interval)
 {
   ifstream file;
-  vector<pair<float, float> > intervalPoints;
-  int xi, fxi, x;
+  vector<pair<long double, long double> > intervalPoints;
+  long double xi, fxi, x;
 
-  file.open("table.txt", ifstream::in);
+  file.open(filename, ifstream::in);
   if(file.is_open())
   {
     for(int i=0; i<interval && file.good(); ++i)
@@ -101,15 +101,15 @@ vector<pair<float, float> > readTable(int interval)
 }
 
 // Menu inicial de escolha das regras
-float ruleMenu(vector<pair<float, float> > intervalPoints)
+long double ruleMenu(vector<pair<long double, long double> > intervalPoints)
 {
     int op;
-    float result;
+    long double result;
 
     clearScreen();
     cout << "1- Regra do Ponto Médio\n2 - Regra dos Trapézios \
             \n3 - Regra de Simpson(n sempre par) \
-            \n4 - Quadratura Gaussiana(até n=6) \
+            \n4 - Quadratura Gaussiana(n=6) \
             \n5 - Sair" << endl;
     cin >> op;
 
@@ -145,10 +145,10 @@ void clearScreen()
     system(CLEAR);
 }
 
-float ponto_medio(vector<pair<float, float> > intervalPoints)
+long double ponto_medio(vector<pair<long double, long double> > intervalPoints)
 {
-  vector<float> med;
-  float H, sum_fxi_med=0, points_size = intervalPoints.size();
+  vector<long double> med;
+  long double H, sum_fxi_med=0, points_size = intervalPoints.size();
 
   if(points_size > 1)
   {
@@ -163,10 +163,10 @@ float ponto_medio(vector<pair<float, float> > intervalPoints)
 }
 
 // TODO caso 1 intervalo
-float trapezios(vector<pair<float, float> > intervalPoints)
+long double trapezios(vector<pair<long double, long double> > intervalPoints)
 {
-  vector<float> trap;
-  float H, sum_fxi=0, points_size = intervalPoints.size();
+  vector<long double> trap;
+  long double H, sum_fxi=0, points_size = intervalPoints.size();
   int i=0;
 
   if(points_size > 1)
@@ -186,10 +186,10 @@ float trapezios(vector<pair<float, float> > intervalPoints)
   return (H/2)*sum_fxi;
 }
 
-float simpson(vector<pair<float, float> > intervalPoints)
+long double simpson(vector<pair<long double, long double> > intervalPoints)
 {
-  vector<float> trap;
-  float H, sum_fxi=0, points_size = intervalPoints.size();
+  vector<long double> trap;
+  long double H, sum_fxi=0, points_size = intervalPoints.size();
   int i=0;
 
   if(points_size > 1)
@@ -209,9 +209,19 @@ float simpson(vector<pair<float, float> > intervalPoints)
   return (H/3)*sum_fxi;
 }
 
-float gaussiana(vector<pair<float, float> > intervalPoints)
+long double gaussiana(vector<pair<long double, long double> > intervalPoints)
 {
-  float result;
+  vector<pair<long double, long double> > newIntervalPoints = readTable("table-gauss.txt", 6);
+  long double H, JC, sum_fxi=0, points_size = newIntervalPoints.size();
 
-  return result;
+  if(points_size > 1)
+  {
+    H=(B-A)/2;
+    JC=(B+A)/2;
+    for(int i=0; i<points_size-1; ++i)
+    {
+      sum_fxi+=newIntervalPoints[i].second*JC*calcFunction((JC*newIntervalPoints[i].first)+H);
+    }
+  }
+  return sum_fxi;
 }
